@@ -11,6 +11,7 @@ const headers = new Headers()
 // 设置请求头
 headers.append('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8')
 
+// 表头
 const columns = [{
     title: 'OrderBy',
     dataIndex: 'OrderBy',
@@ -20,7 +21,7 @@ const columns = [{
     dataIndex: 'GameID'
 }, {
     title: 'IssuerID',
-    dataIndex: 'IssuerID'
+    dataIndex: 'IssuerId'
 }, {
     title: 'ServerID',
     dataIndex: 'ServerID'
@@ -34,9 +35,6 @@ const columns = [{
     title: 'Port',
     dataIndex: 'Port'
 }, {
-    title: 'RateState',
-    dataIndex: 'RateState'
-}, {
     title: 'OnlineNum',
     dataIndex: 'OnlineNum'
 }, {
@@ -44,51 +42,77 @@ const columns = [{
     dataIndex: 'MaxOnlineNum'
 }, {
     title: 'IsRunning',
-    dataIndex: 'IsRunning',
-    render: text => <div className="text-success">{text}</div>
+    dataIndex: 'IsRuning',
+    render: text => {
+        let txt, status
+
+        if (text === 0) {
+            txt = '停止运行'
+            status = 'text-danger'
+        } else if (text === 1) {
+            txt = '正常运行'
+            status = 'text-success'
+        } else {
+            txt = '未开启'
+            status = 'text-warning'
+        }
+
+        return (
+            <div className={status}>{ txt }</div>
+        )
+    },
+    sorter: (a, b) => a.IsRuning - b.IsRuning
 }, {
     title: 'ServerStyle',
     dataIndex: 'ServerStyle',
-    render: text => <div className="text-warning">{text}</div>
+    render: text => {
+        let txt, status
+
+        if (text === 0) {
+            txt = '普通服'
+            status = 'text-warning'
+        } else if (text === 1) {
+            txt = '推荐服'
+            status = 'text-primary'
+        } else {
+            txt = '新服'
+            status = 'text-success'
+        }
+
+        return (
+            <div className={status}>{ txt }</div>
+        )
+    },
+    sorter: (a, b) => a.ServerStyle - b.ServerStyle
 }, {
     title: 'IsStartIPWhite',
-    dataIndex: 'IsStartIPWhite',
-    render: text => <div className="text-danger">{text}</div>
+    dataIndex: 'IsStartIPWhile',
+    render: text => {
+        let txt, status
+
+        if (text === 0) {
+            txt = '停止白名单'
+            status = 'text-danger'
+        } else {
+            txt = '开启白名单'
+            status = 'text-success'
+        }
+
+        return (
+            <div className={status}>{ txt }</div>
+        )
+    },
+    sorter: (a, b) => a.IsStartIPWhile - b.IsStartIPWhile
 }]
-
-const data = []
-
-for (let i = 0; i < 20; i++) {
-    data.push({
-        key: i + 1,
-        OrderBy: i + 1,
-        GameID: 40,
-        IssuerID: 'YHLM[10002]',
-        ServerID: '7400091',
-        ServerName: '9区 叱咤风云',
-        ServerIP: '115.182.109.144',
-        Port: '8088',
-        RateState: '0 (优良)',
-        OnlineNum: 0,
-        MaxOnlineNum: 3500,
-        IsRunning: '正常运行',
-        ServerStyle: '普通服',
-        IsStartIPWhite: '停止白名单'
-    })
-}
 
 class Right extends Component {
     constructor(props) {
         super(props)
-        this.state = {
-            selectedRowKeys: [],
-            loading: false
-        }
     }
 
     onSelectChange = (selectedRowKeys) => {
         console.log('selectedRowKeys changed: ', selectedRowKeys)
-        this.setState({ selectedRowKeys })
+        this.props.onSelectChange(selectedRowKeys)
     }
 
     handleSubmit = () => {
@@ -96,7 +120,7 @@ class Right extends Component {
     }
 
     render() {
-        const { loading, selectedRowKeys } = this.state
+        const { tableData, loading, selectedRowKeys } = this.props
         const { getFieldProps } = this.props.form
         const rowSelection = {
             selectedRowKeys,
@@ -158,13 +182,13 @@ class Right extends Component {
                             </Select>
                         </FormItem>
                         <Popconfirm placement="bottom" title="确定要执行这个任务吗？" onConfirm={this.handleSubmit}>
-                            <Button type="primary" disabled={!hasSelected} loading={loading}>操作</Button>
+                            <Button type="primary" icon="play-circle-o" disabled={!hasSelected || loading}>操作</Button>
                         </Popconfirm>
                     </Form>
                     <Table 
                         rowSelection={rowSelection} 
                         columns={columns} 
-                        dataSource={data} 
+                        dataSource={tableData} 
                         pagination={false} 
                         loading={loading}
                         size="small"
@@ -176,9 +200,11 @@ class Right extends Component {
 }
 
 Right.propTypes = {
-    
+    tableData: PropTypes.array.isRequired,
+    selectedRowKeys: PropTypes.array.isRequired,
+    loading: PropTypes.bool.isRequired
 }
 
-Right = Form.create()(Right);
+Right = Form.create()(Right)
 
 export default Right

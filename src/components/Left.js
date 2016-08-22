@@ -15,20 +15,29 @@ class Left extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            active: 0
+            active: null,
+            product: '请选择'
         }
     }
 
-    getList = (i) => {
+    // 激活当前选中服务器
+    getList = (i, value) => {
         this.setState({
             active: i
         })
+
+        this.props.getTables(value)
+    }
+
+    // 选择产品获取服务器列表
+    handleChange = (value) => {
+        this.setState({product: value})
+        this.props.getServers(value)
     }
 
     render() {
         const { products, serverNames } = this.props
         const { getFieldProps } = this.props.form
-
         return(
             <ul className="sidebar">
                 <li className="logo">
@@ -38,20 +47,26 @@ class Left extends Component {
                     <Select 
                         style={{ width: '100%', marginBottom: '20px' }} 
                         {...getFieldProps('products')}
+                        onChange={this.handleChange}
+                        value={this.state.product}
                         placeholder="请选择"
                     >
                         {
                             products.map((e, i) => 
-                                <Option value={e} key={i}>{e}</Option>
+                                <Option value={e.value} key={i}>{e.value}</Option>
                             )
                         }
                     </Select>
                 </li>
                 {
                     serverNames.map((e, i) => 
-                        <li className={`serverList${this.state.active === i ? ' active' : ''}`} key={i} onClick={this.getList.bind(this, i)}>
+                        <li 
+                            className={`serverList${this.state.active === i ? ' active' : ''}`} 
+                            key={i} 
+                            onClick={this.getList.bind(this, i, e.IssuerId)}
+                        >
                             <Icon type="hdd" />
-                            <span className="nametxt">{e}</span>
+                            <span className="nametxt">{e.IssuerName}</span>
                         </li>
                     )
                 }
