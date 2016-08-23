@@ -1,4 +1,5 @@
-import { GETSERVERS, GETPRODUCTS, GETTABLES, GETLOADING, GETROWKEYS } from '../constants'
+import { notification, message } from 'antd'
+import { GETSERVERS, GETPRODUCTS, GETTABLES, GETLOADING, GETROWKEYS, GETCURPRODUCT } from '../constants'
 import 'fetch-polyfill'
 import 'whatwg-fetch'
 require('es6-promise').polyfill()
@@ -6,8 +7,12 @@ require('es6-promise').polyfill()
 // 创建对象时设置初始化信息
 const headers = new Headers()
 
-// 设置请求头
-headers.append('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8')
+const openNotification = (type) => {
+    notification.open({
+        message: type === 'success' ? '操作成功' : '操作失败',
+        description: type === 'success' ? '你的操作已成功执行' : '你的操作失败了'
+    })
+}
 
 export const setProducts = (data = []) => {
     return {
@@ -44,6 +49,13 @@ export const setRowKeys = (keys = []) => {
     }
 }
 
+export const setCurProduct = (cur) => {
+    return {
+        type: GETCURPRODUCT,
+        cur: cur
+    }
+}
+
 // 获取产品下拉框数据
 export function getProducts() {
     return (dispatch, getState) => {
@@ -67,30 +79,6 @@ function fetchProducts() {
     }
 }
 
-// 获取服务器列表
-export function getServers(product) {
-    return (dispatch, getState) => {
-        return dispatch(fetchServers(product))
-    }
-}
-
-function fetchServers(product) {
-    return dispatch => {
-        let request = new Request('/get_issuers_by_product/', {
-            headers,
-            method: 'POST',
-            credentials: 'include',
-            body: `product=${product}`
-        })
-
-        return fetch(request)
-            .then((res) => { return res.json() })
-            .then((data) => {
-                dispatch(setServers(data))
-            })
-    }
-}
-
 // 获取服务器数据
 export function getTables(server) {
     return (dispatch, getState) => {
@@ -104,7 +92,7 @@ function fetchTables(server) {
             headers,
             method: 'POST',
             credentials: 'include',
-            body: `issuer=${server}`
+            body: JSON.stringify({issuer: server})
         })
 
         dispatch(setLoading(true))
@@ -115,6 +103,61 @@ function fetchTables(server) {
                 dispatch(setRowKeys([]))
                 dispatch(setTables(data))
                 dispatch(setLoading(false))
+            })
+    }
+}
+
+// 获取服务器列表
+export function getServers(product) {
+    return (dispatch, getState) => {
+        return dispatch(fetchServers(product))
+    }
+}
+
+function fetchServers(product) {
+    return dispatch => {
+        let request = new Request('/get_issuers_by_product/', {
+            headers,
+            method: 'POST',
+            credentials: 'include',
+            body: JSON.stringify({product: product})
+        })
+
+        return fetch(request)
+            .then((res) => { return res.json() })
+            .then((data) => {
+                dispatch(setServers(data))
+            })
+    }
+}
+
+// 修改服务器数据
+export function changeServers(param) {
+    return (dispatch, getState) => {
+        return dispatch(fetchChangeServers(param))
+    }
+}
+
+function fetchChangeServers(param) {
+    return dispatch => {
+        let request = new Request('/change_server_state/', {
+            headers,
+            method: 'POST',
+            credentials: 'include',
+            body: JSON.stringify(param)
+        })
+
+        dispatch(setLoading(true))
+
+        return fetch(request)
+            .then((res) => { return res.json() })
+            .then((data) => {
+                if (data.result === 1) {
+                    openNotification('success')
+                    dispatch(getTables(param.curServer))
+                } else {
+                    openNotification('error')
+                }
             })
     }
 }

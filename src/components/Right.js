@@ -5,12 +5,6 @@ const FormItem = Form.Item
 const Option = Select.Option
 const SubMenu = Menu.SubMenu
 
-// 创建对象时设置初始化信息
-const headers = new Headers()
-
-// 设置请求头
-headers.append('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8')
-
 // 表头
 const columns = [{
     title: 'OrderBy',
@@ -111,12 +105,11 @@ class Right extends Component {
     }
 
     onSelectChange = (selectedRowKeys) => {
-        console.log('selectedRowKeys changed: ', selectedRowKeys)
         this.props.onSelectChange(selectedRowKeys)
     }
 
     handleSubmit = () => {
-        console.log('收到表单值：', this.props.form.getFieldsValue())
+        this.props.changeServers(this.props.form.getFieldsValue())
     }
 
     render() {
@@ -132,9 +125,9 @@ class Right extends Component {
         return(
             <div className="right-view">
                 <Menu mode="horizontal">
-                    <SubMenu title={<span><Icon type="user" />luozh</span>}>
+                    <SubMenu title={<span><Icon type="user" />{this.props.username}</span>}>
                         <Menu.Item key="setting:1">
-                            <div className="text-center">退出</div>
+                            <div className="text-center" onClick={this.props.logout}>退出</div>
                         </Menu.Item>
                     </SubMenu>
                 </Menu>
@@ -149,9 +142,9 @@ class Right extends Component {
                                 placeholder="请选择"
                                 allowClear
                             >
-                                <Option value="停服维护">停服维护</Option>
-                                <Option value="正常运行">正常运行</Option>
-                                <Option value="未开启">未开启</Option>
+                                <Option value="0">停服维护</Option>
+                                <Option value="1">正常运行</Option>
+                                <Option value="2">未开启</Option>
                             </Select>
                         </FormItem>
                         <FormItem
@@ -163,9 +156,9 @@ class Right extends Component {
                                 placeholder="请选择"
                                 allowClear
                             >
-                                <Option value="普通服">普通服</Option>
-                                <Option value="推荐服">推荐服</Option>
-                                <Option value="新服">新服</Option>
+                                <Option value="0">普通服</Option>
+                                <Option value="1">推荐服</Option>
+                                <Option value="2">新服</Option>
                             </Select>
                         </FormItem>
                         <FormItem
@@ -177,8 +170,8 @@ class Right extends Component {
                                 placeholder="请选择"
                                 allowClear
                             >
-                                <Option value="开启白名单">开启白名单</Option>
-                                <Option value="停止白名单">停止白名单</Option>
+                                <Option value="1">开启白名单</Option>
+                                <Option value="0">停止白名单</Option>
                             </Select>
                         </FormItem>
                         <Popconfirm placement="bottom" title="确定要执行这个任务吗？" onConfirm={this.handleSubmit}>

@@ -1,8 +1,9 @@
-import { GETPRODUCTS, GETSERVERS, GETTABLES, GETLOADING, GETROWKEYS } from '../constants'
+import { GETPRODUCTS, GETSERVERS, GETTABLES, GETLOADING, GETROWKEYS, GETCURPRODUCT } from '../constants'
 
 // 初始化state数据
 const initialState = {
     products: [],
+    curProduct: '请选择',
     serverNames: [],
     tableData: [],
     loading: false,
@@ -13,6 +14,9 @@ export default function serverLeft(state = initialState, action) {
     switch(action.type) {
         case GETPRODUCTS:
             return Object.assign({}, state, { products: action.products })
+            break
+        case GETCURPRODUCT:
+            return Object.assign({}, state, { curProduct: action.cur })
             break
         case GETSERVERS:
             return Object.assign({}, state, { serverNames: action.servers })

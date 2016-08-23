@@ -1,22 +1,33 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { getProducts, getServers, getTables, setRowKeys } from '../actions/count'
+import { getProducts, getServers, getTables, setRowKeys, setCurProduct, changeServers } from '../actions/count'
 import Left from '../components/Left'
 import Right from '../components/Right'
+
+import 'fetch-polyfill'
+import 'whatwg-fetch'
+require('es6-promise').polyfill()
 
 // 创建对象时设置初始化信息
 const headers = new Headers()
 
-// 设置请求头
-headers.append('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8')
-
 class App extends Component {
     constructor(props) {
         super(props)
+        this.state = {
+            username: '',
+            curServer: ''
+        }
     }
 
     componentDidMount() {
+        this.getUser()
         this.props.getProducts()
+    }
+
+    // 当前选中产品
+    getCurProduct = (cur) => {
+        this.props.setCurProduct(cur)
     }
 
     // 获取服务器列表
@@ -27,6 +38,9 @@ class App extends Component {
     // 获取表格数据
     getTables = (server) => {
         this.props.getTables(server)
+        this.setState({
+            curServer: server
+        })
     }
 
     // 选中行id
@@ -34,22 +48,73 @@ class App extends Component {
         this.props.setRowKeys(keys)
     }
 
+    // 修改服务器列表
+    changeServers = (formData) => {
+        const {curProduct, keys, changeServers} = this.props
+
+        changeServers({
+            curServer: this.state.curServer,
+            product: curProduct, 
+            stateIds: keys,
+            IsRuning: formData.isRunning,
+            ServerStyle: formData.serverStyle,
+            IsStartIPWhile: formData.isStartIpWhite
+        })
+    }
+
+    // 获取用户名
+    getUser = () => {
+        let request = new Request('/userinfo/', {
+            headers,
+            method: 'POST',
+            credentials: 'include'
+        })
+
+        return fetch(request)
+            .then((res) => { return res.json() })
+            .then((data) => {
+                this.setState({
+                    username: data.username
+                })
+            })
+    }
+
+    // 退出
+    logout = () => {
+        let request = new Request('/logout/', {
+            headers,
+            method: 'POST',
+            credentials: 'include'
+        })
+
+        fetch(request)
+            .then((res) => { return res.json() })
+            .then((data) => {
+                location.href="/"
+            })
+    }
+
     render() {
-        const { serverNames, products, tableData, loading, keys } = this.props
+        const { serverNames, products, curProduct, tableData, loading, keys } = this.props
 
         return(
             <div className="main">
                 <Left 
-                    products={products} 
+                    products={products}
+                    curProduct={curProduct}
                     serverNames={serverNames} 
                     getServers={this.getServers}
                     getTables={this.getTables}
+                    getCurProduct={this.getCurProduct}
                 ></Left>
-                <Right 
+                <Right
+                    username={this.state.username}
+                    logout={this.logout}
                     tableData={tableData} 
                     loading={loading}
                     selectedRowKeys={keys}
                     onSelectChange={this.onSelectChange}
+                    changeServers={this.changeServers}
                 ></Right>
             </div>
         )
@@ -59,6 +124,7 @@ class App extends Component {
 const getData = state => {
     return {
         products: state.serverLeft.products,
+        curProduct: state.serverLeft.curProduct,
         serverNames: state.serverLeft.serverNames,
         tableData: state.serverLeft.tableData,
         loading: state.serverLeft.loading,
@@ -66,4 +132,4 @@ const getData = state => {
     }
 }
 
-export default connect(getData, { getProducts, getServers, getTables, setRowKeys })(App)
+export default connect(getData, { getProducts, getServers, getTables, setRowKeys, setCurProduct, changeServers })(App)

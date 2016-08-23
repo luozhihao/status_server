@@ -5,18 +5,11 @@ import { Form, Icon, Select } from 'antd'
 const FormItem = Form.Item
 const Option = Select.Option
 
-// 创建对象时设置初始化信息
-const headers = new Headers()
-
-// 设置请求头
-headers.append('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8')
-
 class Left extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            active: null,
-            product: '请选择'
+            active: null
         }
     }
 
@@ -31,12 +24,12 @@ class Left extends Component {
 
     // 选择产品获取服务器列表
     handleChange = (value) => {
-        this.setState({product: value})
+        this.props.getCurProduct(value)
         this.props.getServers(value)
     }
 
     render() {
-        const { products, serverNames } = this.props
+        const { products, serverNames, curProduct } = this.props
         const { getFieldProps } = this.props.form
         return(
             <ul className="sidebar">
@@ -48,7 +41,7 @@ class Left extends Component {
                         style={{ width: '100%', marginBottom: '20px' }} 
                         {...getFieldProps('products')}
                         onChange={this.handleChange}
-                        value={this.state.product}
+                        value={curProduct}
                         placeholder="请选择"
                     >
                         {
@@ -79,7 +72,8 @@ Left = Form.create()(Left)
 
 Left.propTypes = {
     products: PropTypes.array.isRequired,
-    serverNames: PropTypes.array.isRequired
+    serverNames: PropTypes.array.isRequired,
+    curProduct: PropTypes.string.isRequired
 }
 
 export default Left
