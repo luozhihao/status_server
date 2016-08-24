@@ -37,7 +37,7 @@ class App extends Component {
 
     // 获取表格数据
     getTables = (server) => {
-        this.props.getTables(server)
+        this.props.getTables(server, this.props.curProduct)
         this.setState({
             curServer: server
         })

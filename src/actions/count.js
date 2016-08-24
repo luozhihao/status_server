@@ -80,19 +80,19 @@ function fetchProducts() {
 }
 
 // 获取服务器数据
-export function getTables(server) {
+export function getTables(server, curProduct) {
     return (dispatch, getState) => {
-        return dispatch(fetchTables(server))
+        return dispatch(fetchTables(server, curProduct))
     }
 }
 
-function fetchTables(server) {
+function fetchTables(server, curProduct) {
     return dispatch => {
         let request = new Request('/get_server_by_issuer/', {
             headers,
             method: 'POST',
             credentials: 'include',
-            body: JSON.stringify({issuer: server})
+            body: JSON.stringify({issuer: server, product: curProduct})
         })
 
         dispatch(setLoading(true))
@@ -154,7 +154,7 @@ function fetchChangeServers(param) {
             .then((data) => {
                 if (data.result === 1) {
                     openNotification('success')
-                    dispatch(getTables(param.curServer))
+                    dispatch(getTables(param.curServer, param.product))
                 } else {
                     openNotification('error')
                 }

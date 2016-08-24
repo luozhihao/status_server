@@ -104,12 +104,15 @@ class Right extends Component {
         super(props)
     }
 
+    // 获取选中行ID
     onSelectChange = (selectedRowKeys) => {
         this.props.onSelectChange(selectedRowKeys)
     }
 
+    // 提交表单并重置
     handleSubmit = () => {
         this.props.changeServers(this.props.form.getFieldsValue())
+        this.props.form.resetFields()
     }
 
     render() {
