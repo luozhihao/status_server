@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { getProducts, getServers, getTables, setRowKeys, setCurProduct, changeServers } from '../actions/count'
+import { getProducts, getServers, getTables, setRowKeys, setCurProduct, changeServers, setTables } from '../actions/count'
 import Left from '../components/Left'
 import Right from '../components/Right'
 
@@ -26,17 +26,17 @@ class App extends Component {
     }
 
     // 当前选中产品
-    getCurProduct = (cur) => {
+    getCurProduct = cur => {
         this.props.setCurProduct(cur)
     }
 
     // 获取服务器列表
-    getServers = (product) => {
+    getServers = product => {
         this.props.getServers(product)
     }
 
     // 获取表格数据
-    getTables = (server) => {
+    getTables = server => {
         this.props.getTables(server, this.props.curProduct)
         this.setState({
             curServer: server
@@ -44,12 +44,12 @@ class App extends Component {
     }
 
     // 选中行id
-    onSelectChange = (keys) => {
+    onSelectChange = keys => {
         this.props.setRowKeys(keys)
     }
 
     // 修改服务器列表
-    changeServers = (formData) => {
+    changeServers = formData => {
         const {curProduct, keys, changeServers} = this.props
 
         changeServers({
@@ -60,6 +60,29 @@ class App extends Component {
             ServerStyle: formData.serverStyle,
             IsStartIPWhile: formData.isStartIpWhite
         })
+    }
+
+    // 开启关闭查询服务器白名单
+    operateFn = type => {
+        const {curProduct, keys} = this.props
+
+        let request = new Request('/change_server_white/', {
+            headers,
+            method: 'POST',
+            credentials: 'include',
+            body: JSON.stringify({type: type, stateIds: keys, product: curProduct})
+        })
+
+        return fetch(request)
+            .then((res) => { return res.json() })
+            .then((data) => {
+                console.log(data)
+            })
+    }
+
+    // 搜索功能
+    searchFn = data => {
+        this.props.setTables(data)
     }
 
     // 获取用户名
@@ -115,6 +138,8 @@ class App extends Component {
                     selectedRowKeys={keys}
                     onSelectChange={this.onSelectChange}
                     changeServers={this.changeServers}
+                    operateFn={this.operateFn}
+                    searchFn={this.searchFn}
                 ></Right>
             </div>
         )
@@ -132,4 +157,4 @@ const getData = state => {
     }
 }
 
-export default connect(getData, { getProducts, getServers, getTables, setRowKeys, setCurProduct, changeServers })(App)
+export default connect(getData, { getProducts, getServers, getTables, setRowKeys, setCurProduct, changeServers, setTables })(App)

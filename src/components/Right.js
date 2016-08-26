@@ -1,9 +1,11 @@
 // 动态数据列表
 import React, { Component, PropTypes } from 'react'
-import { Form, Table, Button, Select, Menu, Icon, Popconfirm } from 'antd'
+import { Form, Table, Button, Select, Menu, Icon, Popconfirm, Input } from 'antd'
 const FormItem = Form.Item
 const Option = Select.Option
 const SubMenu = Menu.SubMenu
+const ButtonGroup = Button.Group
+const InputGroup = Input.Group
 
 // 表头
 const columns = [{
@@ -102,6 +104,10 @@ const columns = [{
 class Right extends Component {
     constructor(props) {
         super(props)
+        this.state = {
+            search: '',
+            filterData: []
+        }
     }
 
     // 获取选中行ID
@@ -113,6 +119,27 @@ class Right extends Component {
     handleSubmit = () => {
         this.props.changeServers(this.props.form.getFieldsValue())
         this.props.form.resetFields()
+    }
+
+    // 搜索功能
+    searchFn = e => {
+        let value = e.target.value
+
+        const filterData = this.props.tableData.filter(item => 
+            item.ServerID.toString().indexOf(value) > -1 || item.ServerName.indexOf(value) > -1
+        )
+
+        this.setState({
+            search: value,
+            filterData: filterData
+        })
+
+        this.onSelectChange([])
+    }
+
+    // 开启关闭查询服务器白名单
+    operateFn = type => {
+        this.props.operateFn(type)
     }
 
     render() {
@@ -177,14 +204,27 @@ class Right extends Component {
                                 <Option value="0">停止白名单</Option>
                             </Select>
                         </FormItem>
-                        <Popconfirm placement="bottom" title="确定要执行这个任务吗？" onConfirm={this.handleSubmit}>
-                            <Button type="primary" icon="play-circle-o" disabled={!hasSelected || loading}>操作</Button>
-                        </Popconfirm>
+                        <div style={{ marginRight: '10px', display: 'inline-block' }}>
+                            <Popconfirm placement="bottom" title="确定要执行这个任务吗？" onConfirm={this.handleSubmit}>
+                                <Button type="primary" icon="play-circle-o" disabled={!hasSelected || loading}>操作</Button>
+                            </Popconfirm>
+                        </div>
+                        <ButtonGroup>
+                            <Button type="ghost" onClick={this.operateFn.bind(this, 1)} disabled={!hasSelected || loading}>开启服务器白名单</Button>
+                            <Button type="ghost" onClick={this.operateFn.bind(this, 2)} disabled={!hasSelected || loading}>关闭服务器白名单</Button>
+                            <Button type="ghost" onClick={this.operateFn.bind(this, 3)} disabled={!hasSelected || loading}>查询服务器白名单</Button>
+                        </ButtonGroup>
+                        <FormItem
+                          label="搜索"
+                          className='pull-right'
+                        >
+                            <Input style={{ width: 150 }} placeholder="ServerID/ServerName" onChange={this.searchFn} />
+                        </FormItem>
                     </Form>
                     <Table 
                         rowSelection={rowSelection} 
                         columns={columns} 
-                        dataSource={tableData} 
+                        dataSource={this.state.search ? this.state.filterData : tableData} 
                         pagination={false} 
                         loading={loading}
                         size="small"

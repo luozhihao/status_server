@@ -23,7 +23,7 @@ class Left extends Component {
     }
 
     // 选择产品获取服务器列表
-    handleChange = (value) => {
+    handleChange = value => {
         this.props.getCurProduct(value)
         this.props.getServers(value)
     }
