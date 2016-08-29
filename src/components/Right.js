@@ -5,45 +5,54 @@ const FormItem = Form.Item
 const Option = Select.Option
 const SubMenu = Menu.SubMenu
 const ButtonGroup = Button.Group
-const InputGroup = Input.Group
 
 // 表头
 const columns = [{
     title: 'OrderBy',
     dataIndex: 'OrderBy',
+    width: '10%',
     sorter: (a, b) => a.OrderBy - b.OrderBy
 }, {
     title: 'GameID',
-    dataIndex: 'GameID'
+    dataIndex: 'GameID',
+    width: '5%'
 }, {
     title: 'IssuerID',
-    dataIndex: 'IssuerId'
+    dataIndex: 'IssuerId',
+    width: '5%'
 }, {
     title: 'ServerID',
-    dataIndex: 'ServerID'
+    dataIndex: 'ServerID',
+    width: '10%'
 }, {
     title: 'ServerName',
-    dataIndex: 'ServerName'
+    dataIndex: 'ServerName',
+    width: '10%'
 }, {
     title: 'ServerIP',
-    dataIndex: 'ServerIP'
+    dataIndex: 'ServerIP',
+    width: '10%'
 }, {
     title: 'Port',
-    dataIndex: 'Port'
+    dataIndex: 'Port',
+    width: '5%'
 }, {
     title: 'OnlineNum',
-    dataIndex: 'OnlineNum'
+    dataIndex: 'OnlineNum',
+    width: '5%'
 }, {
     title: 'MaxOnlineNum',
-    dataIndex: 'MaxOnlineNum'
+    dataIndex: 'MaxOnlineNum',
+    width: '5%',
 }, {
     title: 'IsRunning',
     dataIndex: 'IsRuning',
+    width: '10%',
     render: text => {
         let txt, status
 
         if (text === 0) {
-            txt = '停止运行'
+            txt = '停服维护'
             status = 'text-danger'
         } else if (text === 1) {
             txt = '正常运行'
@@ -61,6 +70,7 @@ const columns = [{
 }, {
     title: 'ServerStyle',
     dataIndex: 'ServerStyle',
+    width: '10%',
     render: text => {
         let txt, status
 
@@ -83,6 +93,7 @@ const columns = [{
 }, {
     title: 'IsStartIPWhite',
     dataIndex: 'IsStartIPWhile',
+    width: '10%',
     render: text => {
         let txt, status
 
@@ -130,9 +141,10 @@ class Right extends Component {
         )
 
         this.setState({
-            search: value,
             filterData: filterData
         })
+
+        this.props.searchFn(value)
 
         this.onSelectChange([])
     }
@@ -143,7 +155,7 @@ class Right extends Component {
     }
 
     render() {
-        const { tableData, loading, selectedRowKeys } = this.props
+        const { tableData, loading, selectedRowKeys, search } = this.props
         const { getFieldProps } = this.props.form
         const rowSelection = {
             selectedRowKeys,
@@ -163,6 +175,11 @@ class Right extends Component {
                 </Menu>
                 <div className="right-box">
                     <Form inline className="form-operate">
+                        <FormItem
+                          label="搜索"
+                        >
+                            <Input style={{ width: 150, marginRight: '80px' }} placeholder="ServerID/ServerName" onChange={this.searchFn} value={search} />
+                        </FormItem>
                         <FormItem
                           label="运行状态"
                         >
@@ -209,25 +226,22 @@ class Right extends Component {
                                 <Button type="primary" icon="play-circle-o" disabled={!hasSelected || loading}>操作</Button>
                             </Popconfirm>
                         </div>
-                        <ButtonGroup>
-                            <Button type="ghost" onClick={this.operateFn.bind(this, 1)} disabled={!hasSelected || loading}>开启服务器白名单</Button>
-                            <Button type="ghost" onClick={this.operateFn.bind(this, 2)} disabled={!hasSelected || loading}>关闭服务器白名单</Button>
-                            <Button type="ghost" onClick={this.operateFn.bind(this, 3)} disabled={!hasSelected || loading}>查询服务器白名单</Button>
-                        </ButtonGroup>
-                        <FormItem
-                          label="搜索"
-                          className='pull-right'
-                        >
-                            <Input style={{ width: 150 }} placeholder="ServerID/ServerName" onChange={this.searchFn} />
-                        </FormItem>
                     </Form>
                     <Table 
                         rowSelection={rowSelection} 
                         columns={columns} 
-                        dataSource={this.state.search ? this.state.filterData : tableData} 
+                        dataSource={search ? this.state.filterData : tableData} 
                         pagination={false} 
                         loading={loading}
+                        scroll={{ y: 400 }}
                         size="small"
+                        footer={() => 
+                            <ButtonGroup>
+                                <Button type="ghost" onClick={this.operateFn.bind(this, 1)} disabled={!hasSelected || loading}>开启服务器白名单</Button>
+                                <Button type="ghost" onClick={this.operateFn.bind(this, 2)} disabled={!hasSelected || loading}>关闭服务器白名单</Button>
+                                <Button type="ghost" onClick={this.operateFn.bind(this, 3)} disabled={!hasSelected || loading}>查询服务器白名单</Button>
+                            </ButtonGroup>
+                        }
                     />
                 </div>
             </div>
@@ -238,7 +252,8 @@ class Right extends Component {
 Right.propTypes = {
     tableData: PropTypes.array.isRequired,
     selectedRowKeys: PropTypes.array.isRequired,
-    loading: PropTypes.bool.isRequired
+    loading: PropTypes.bool.isRequired,
+    search: PropTypes.string.isRequired
 }
 
 Right = Form.create()(Right)

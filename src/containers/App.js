@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { getProducts, getServers, getTables, setRowKeys, setCurProduct, changeServers, setTables } from '../actions/count'
+import { getProducts, getServers, getTables, setRowKeys, setCurProduct, changeServers, setTables, changeWhite, setSearch } from '../actions/count'
 import Left from '../components/Left'
 import Right from '../components/Right'
 
@@ -37,6 +37,7 @@ class App extends Component {
 
     // 获取表格数据
     getTables = server => {
+        this.props.setSearch('')
         this.props.getTables(server, this.props.curProduct)
         this.setState({
             curServer: server
@@ -64,25 +65,14 @@ class App extends Component {
 
     // 开启关闭查询服务器白名单
     operateFn = type => {
-        const {curProduct, keys} = this.props
+        const {curProduct, keys, changeWhite} = this.props
 
-        let request = new Request('/change_server_white/', {
-            headers,
-            method: 'POST',
-            credentials: 'include',
-            body: JSON.stringify({type: type, stateIds: keys, product: curProduct})
-        })
-
-        return fetch(request)
-            .then((res) => { return res.json() })
-            .then((data) => {
-                console.log(data)
-            })
+        changeWhite({type: type, stateIds: keys, product: curProduct})
     }
 
-    // 搜索功能
-    searchFn = data => {
-        this.props.setTables(data)
+    // 搜索内容
+    searchFn = txt => {
+        this.props.setSearch(txt)
     }
 
     // 获取用户名
@@ -118,7 +108,7 @@ class App extends Component {
     }
 
     render() {
-        const { serverNames, products, curProduct, tableData, loading, keys } = this.props
+        const { serverNames, products, curProduct, tableData, loading, keys, search } = this.props
 
         return(
             <div className="main">
@@ -140,6 +130,7 @@ class App extends Component {
                     changeServers={this.changeServers}
                     operateFn={this.operateFn}
                     searchFn={this.searchFn}
+                    search={search}
                 ></Right>
             </div>
         )
@@ -153,8 +144,9 @@ const getData = state => {
         serverNames: state.serverLeft.serverNames,
         tableData: state.serverLeft.tableData,
         loading: state.serverLeft.loading,
-        keys: state.serverLeft.keys
+        keys: state.serverLeft.keys,
+        search: state.serverLeft.search
     }
 }
 
-export default connect(getData, { getProducts, getServers, getTables, setRowKeys, setCurProduct, changeServers, setTables })(App)
+export default connect(getData, { getProducts, getServers, getTables, setRowKeys, setCurProduct, changeServers, setTables, changeWhite, setSearch })(App)

@@ -1,5 +1,6 @@
-import { notification, message } from 'antd'
-import { GETSERVERS, GETPRODUCTS, GETTABLES, GETLOADING, GETROWKEYS, GETCURPRODUCT } from '../constants'
+import React, { Component } from 'react'
+import { notification, message, Modal, Button } from 'antd'
+import { GETSERVERS, GETPRODUCTS, GETTABLES, GETLOADING, GETROWKEYS, GETCURPRODUCT, GETSEARCH } from '../constants'
 import 'fetch-polyfill'
 import 'whatwg-fetch'
 require('es6-promise').polyfill()
@@ -11,6 +12,22 @@ const openNotification = (type) => {
     notification.open({
         message: type === 'success' ? '操作成功' : '操作失败',
         description: type === 'success' ? '你的操作已成功执行' : '你的操作失败了'
+    })
+}
+
+function info(msg) {
+    Modal.info({
+        title: '服务器白名单信息',
+        content: (
+            <div>
+                {
+                    msg.map((e, i) =>
+                        <p key={i}>{e}</p>
+                    )
+                }
+            </div>
+        ),
+        onOk() {}
     })
 }
 
@@ -53,6 +70,13 @@ export const setCurProduct = (cur) => {
     return {
         type: GETCURPRODUCT,
         cur: cur
+    }
+}
+
+export const setSearch = (search) => {
+    return {
+        type: GETSEARCH,
+        search: search
     }
 }
 
@@ -155,6 +179,42 @@ function fetchChangeServers(param) {
                 if (data.result === 1) {
                     openNotification('success')
                     dispatch(getTables(param.curServer, param.product))
+                } else {
+                    openNotification('error')
+                }
+            })
+    }
+}
+
+// 白名单操作
+export function changeWhite(param) {
+    return (dispatch, getState) => {
+        return dispatch(fetchChangeWhite(param))
+    }
+}
+
+function fetchChangeWhite(param) {
+    return dispatch => {
+        let request = new Request('/change_server_white/', {
+            headers,
+            method: 'POST',
+            credentials: 'include',
+            body: JSON.stringify({type: param.type, stateIds: param.stateIds, product: param.product})
+        })
+
+        dispatch(setLoading(true))
+        const hide = message.loading('正在执行中...', 0)
+
+        return fetch(request)
+            .then((res) => { return res.json() })
+            .then((data) => {
+                dispatch(setLoading(false))
+                setTimeout(hide, 0)
+
+                if (data.result === 1) {
+                    dispatch(setRowKeys([]))
+
+                    param.type !==3 ? openNotification('success') : info(data.output)
                 } else {
                     openNotification('error')
                 }

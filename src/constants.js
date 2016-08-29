@@ -5,4 +5,5 @@ export const GETTABLES = 'GETTABLES'
 export const GETLOADING = 'GETLOADING'
 export const GETROWKEYS = 'GETROWKEYS'
 export const GETCURPRODUCT = 'GETCURPRODUCT'
+export const GETSEARCH = 'GETSEARCH'
 
