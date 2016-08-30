@@ -1,6 +1,6 @@
 // 动态数据列表
 import React, { Component, PropTypes } from 'react'
-import { Form, Icon, Select, Button, Modal, Input } from 'antd'
+import { Form, Icon, Select, Button, Modal, Input, message } from 'antd'
 
 import 'fetch-polyfill'
 import 'whatwg-fetch'
@@ -65,7 +65,9 @@ class Left extends Component {
 
     // 提交配置信息回调
     confirmSettings = (values) => {
-        let request = new Request('/confirm/', {
+        const { curProduct } = this.props
+
+        let request = new Request('/edit_product/', {
             headers,
             method: 'POST',
             credentials: 'include',
@@ -74,15 +76,26 @@ class Left extends Component {
                 host: values.host,
                 port: values.port,
                 user: values.user,
-                pwd: values.pwd
+                pwd: values.pwd,
+                product: curProduct
             })
         })
 
         return fetch(request)
             .then((res) => { return res.json() })
             .then((data) => {
-                this.setState({loading: false, settingsModal: false})
-                this.props.form.resetFields()
+                if (data.result === 1) {
+                    this.setState({settingsModal: false})
+                    this.props.form.resetFields()
+                    this.handleChange(curProduct)
+
+                    message.success('连接成功！')
+                } else if (data.result === -1) {
+                    message.error('连接失败！')
+                } else {
+                    message.error('保存失败！')
+                }
+                this.setState({loading: false})
             })
     }
 
@@ -107,6 +120,7 @@ class Left extends Component {
         })
 
         const portProps = getFieldProps('port', {
+            initialValue: '1433',
             rules: [
                 { required: true, message: '请填写端口号' }
             ]
@@ -171,19 +185,12 @@ class Left extends Component {
                     title="数据库配置" onCancel={this.handleCancel}
                     footer={[
                         <Button key="submit" type="primary" size="large" onClick={this.handleSubmit} loading={this.state.loading}>
-                        提 交
+                        测试连接
                         </Button>,
                         <Button key="back" type="ghost" size="large" onClick={this.handleCancel}>关 闭</Button>
                   ]}
                 >
                     <Form horizontal form={this.props.form}>
-                        <FormItem
-                            {...formItemLayout}
-                            label="数据库名称"
-                            hasFeedback
-                        >
-                            <Input type="text" {...dbProps} placeholder="请输入数据库名称" />
-                        </FormItem>
                         <FormItem
                             {...formItemLayout}
                             label="数据库IP"
@@ -211,6 +218,13 @@ class Left extends Component {
                             hasFeedback
                         >
                             <Input {...pwdProps} type="password" placeholder="请输入密码" />
+                        </FormItem>
+                        <FormItem
+                            {...formItemLayout}
+                            label="数据库名称"
+                            hasFeedback
+                        >
+                            <Input type="text" {...dbProps} placeholder="请输入数据库名称" />
                         </FormItem>
                     </Form>
                 </Modal>
