@@ -237,9 +237,9 @@ class Right extends Component {
                         size="small"
                         footer={() => 
                             <ButtonGroup>
-                                <Button type="ghost" onClick={this.operateFn.bind(this, 1)} disabled={!hasSelected || loading}>开启服务器白名单</Button>
-                                <Button type="ghost" onClick={this.operateFn.bind(this, 2)} disabled={!hasSelected || loading}>关闭服务器白名单</Button>
-                                <Button type="ghost" onClick={this.operateFn.bind(this, 3)} disabled={!hasSelected || loading}>查询服务器白名单</Button>
+                                <Button type="ghost" onClick={this.operateFn.bind(this, 1)} disabled={!hasSelected || loading}>内网测试</Button>
+                                <Button type="ghost" onClick={this.operateFn.bind(this, 2)} disabled={!hasSelected || loading}>对外开放</Button>
+                                <Button type="ghost" onClick={this.operateFn.bind(this, 3)} disabled={!hasSelected || loading}>查询是否对外开放</Button>
                             </ButtonGroup>
                         }
                     />
