@@ -108,7 +108,7 @@ class App extends Component {
     }
 
     render() {
-        const { serverNames, products, curProduct, tableData, loading, keys, search } = this.props
+        const { serverNames, products, curProduct, tableData, loading, keys, search, refreshSearch } = this.props
 
         return(
             <div className="main">
@@ -131,6 +131,7 @@ class App extends Component {
                     operateFn={this.operateFn}
                     searchFn={this.searchFn}
                     search={search}
+                    refreshSearch={refreshSearch}
                 ></Right>
             </div>
         )
@@ -145,7 +146,8 @@ const getData = state => {
         tableData: state.serverLeft.tableData,
         loading: state.serverLeft.loading,
         keys: state.serverLeft.keys,
-        search: state.serverLeft.search
+        search: state.serverLeft.search,
+        refreshSearch: state.serverLeft.refreshSearch
     }
 }
 
