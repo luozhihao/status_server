@@ -131,7 +131,6 @@ class App extends Component {
                     operateFn={this.operateFn}
                     searchFn={this.searchFn}
                     search={search}
-                    refreshSearch={refreshSearch}
                 ></Right>
             </div>
         )
@@ -146,8 +145,7 @@ const getData = state => {
         tableData: state.serverLeft.tableData,
         loading: state.serverLeft.loading,
         keys: state.serverLeft.keys,
-        search: state.serverLeft.search,
-        refreshSearch: state.serverLeft.refreshSearch
+        search: state.serverLeft.search
     }
 }
 

@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { notification, message, Modal, Button } from 'antd'
-import { GETSERVERS, GETPRODUCTS, GETTABLES, GETLOADING, GETROWKEYS, GETCURPRODUCT, GETSEARCH, REFRESHSEARCH } from '../constants'
+import { GETSERVERS, GETPRODUCTS, GETTABLES, GETLOADING, GETROWKEYS, GETCURPRODUCT, GETSEARCH } from '../constants'
 import 'fetch-polyfill'
 import 'whatwg-fetch'
 require('es6-promise').polyfill()
@@ -80,12 +80,6 @@ export const setSearch = (search) => {
     }
 }
 
-export const refreshSearch = () => {
-    return {
-        type: REFRESHSEARCH
-    }
-}
-
 // 获取产品下拉框数据
 export function getProducts() {
     return (dispatch, getState) => {
@@ -132,7 +126,6 @@ function fetchTables(server, curProduct) {
             .then((data) => {
                 dispatch(setRowKeys([]))
                 dispatch(setTables(data))
-                dispatch(refreshSearch())
                 dispatch(setLoading(false))
             })
     }
@@ -185,6 +178,7 @@ function fetchChangeServers(param) {
             .then((data) => {
                 if (data.result === 1) {
                     openNotification('success')
+                    dispatch(setSearch(''))
                     dispatch(getTables(param.curServer, param.product))
                 } else {
                     openNotification('error')

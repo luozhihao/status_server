@@ -117,8 +117,7 @@ class Right extends Component {
         super(props)
         this.state = {
             search: '',
-            filterData: [],
-            refreshSearch: false
+            filterData: []
         }
     }
 
@@ -150,24 +149,13 @@ class Right extends Component {
         this.onSelectChange([])
     }
 
-    // 清除搜索缓存
-    refreshSearch = () => {
-        const filterData = this.props.tableData.filter(item => 
-            item.ServerID.toString().indexOf(this.props.search) > -1 || item.ServerName.indexOf(this.props.search) > -1
-        )
-
-        this.setState({
-            filterData: filterData
-        })
-    }
-
     // 开启关闭查询服务器白名单
     operateFn = type => {
         this.props.operateFn(type)
     }
 
     render() {
-        const { tableData, loading, selectedRowKeys, search, refreshSearch } = this.props
+        const { tableData, loading, selectedRowKeys, search } = this.props
         const { getFieldProps } = this.props.form
         const rowSelection = {
             selectedRowKeys,
@@ -175,11 +163,6 @@ class Right extends Component {
         }
 
         const hasSelected = selectedRowKeys.length > 0
-
-        if (refreshSearch !== this.state.refreshSearch) {
-            this.refreshSearch()
-            this.setState({refreshSearch: refreshSearch})
-        }
 
         return(
             <div className="right-view">
@@ -270,8 +253,7 @@ Right.propTypes = {
     tableData: PropTypes.array.isRequired,
     selectedRowKeys: PropTypes.array.isRequired,
     loading: PropTypes.bool.isRequired,
-    search: PropTypes.string.isRequired,
-    refreshSearch: PropTypes.bool.isRequired
+    search: PropTypes.string.isRequired
 }
 
 Right = Form.create()(Right)
