@@ -1,6 +1,6 @@
 // 动态数据列表
 import React, { Component, PropTypes } from 'react'
-import { Form, Table, Button, Select, Menu, Icon, Popconfirm, Input } from 'antd'
+import { Form, Table, Button, Select, Menu, Icon, Popconfirm, Input, Upload, message } from 'antd'
 const FormItem = Form.Item
 const Option = Select.Option
 const SubMenu = Menu.SubMenu
@@ -117,7 +117,8 @@ class Right extends Component {
         super(props)
         this.state = {
             search: '',
-            filterData: []
+            filterData: [],
+            uploading: false
         }
     }
 
@@ -163,6 +164,38 @@ class Right extends Component {
         }
 
         const hasSelected = selectedRowKeys.length > 0
+
+        let _this = this
+
+        const props = {
+            action: '/excel/excel_import/',
+            beforeUpload(file) {
+                const isXlsx = file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+
+                if (!isXlsx) {
+                    message.error('只能上传 .xlsx后缀 文件！')
+                }
+
+                return isXlsx;
+            },
+            onChange(data) {
+                if (data.file.status === 'uploading') {
+                    _this.setState({uploading: true})
+                } else {
+                    if (data) {
+                        let obj = data.file.response
+
+                        if (obj.code === 200) {
+                            message.success('导入成功！')
+                        } else {
+                            message.error(obj.msg)
+                        }
+
+                        _this.setState({uploading: false})
+                    }
+                }
+            }
+        }
 
         return(
             <div className="right-view">
@@ -235,12 +268,26 @@ class Right extends Component {
                         loading={loading}
                         scroll={{ y: 400 }}
                         size="small"
-                        footer={() => 
-                            <ButtonGroup>
-                                <Button type="ghost" onClick={this.operateFn.bind(this, 1)} disabled={!hasSelected || loading}>内网测试</Button>
-                                <Button type="ghost" onClick={this.operateFn.bind(this, 2)} disabled={!hasSelected || loading}>对外开放</Button>
-                                <Button type="ghost" onClick={this.operateFn.bind(this, 3)} disabled={!hasSelected || loading}>查询是否对外开放</Button>
-                            </ButtonGroup>
+                        footer={() => {
+                                return(
+                                    <div>
+                                        <ButtonGroup>
+                                            <Button type="ghost" onClick={this.operateFn.bind(this, 1)} disabled={!hasSelected || loading}>内网测试</Button>
+                                            <Button type="ghost" onClick={this.operateFn.bind(this, 2)} disabled={!hasSelected || loading}>对外开放</Button>
+                                            <Button type="ghost" onClick={this.operateFn.bind(this, 3)} disabled={!hasSelected || loading}>查询是否对外开放</Button>
+                                        </ButtonGroup>
+                                        <div className="upload-list">
+                                            <Upload {...props}>
+                                                <Button type="ghost" icon="upload" loading={this.state.uploading}>
+                                                    手动上传备用列表
+                                                </Button>
+                                            </Upload>
+                                            &nbsp;
+                                            <Button type="ghost" icon="copy">自动生成备用列表</Button>
+                                        </div>
+                                    </div>
+                                )
+                            }
                         }
                     />
                 </div>
