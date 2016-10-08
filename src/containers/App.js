@@ -1,10 +1,22 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { getProducts, getServers, getTables, setRowKeys, setCurProduct, changeServers, setTables, changeWhite, setSearch } from '../actions/count'
+import { 
+    getProducts,
+    getServers, 
+    getTables, 
+    setRowKeys, 
+    setCurProduct, 
+    changeServers, 
+    setTables, 
+    changeWhite, 
+    setSearch,
+    setActive
+} from '../actions/count'
 import Left from '../components/Left'
 import Right from '../components/Right'
 import SettingModal from '../components/SettingModal'
 import CdnModal from '../components/CdnModal'
+import UploadModal from '../components/UploadModal'
 import { message } from 'antd'
 
 import 'fetch-polyfill'
@@ -20,7 +32,8 @@ class App extends Component {
             settingsModal: false,
             settingsData: null,
             cdnModal: false,
-            cdnNames: []
+            cdnNames: [],
+            uploadModal: false
         }
     }
 
@@ -36,6 +49,10 @@ class App extends Component {
 
     cdnCancel = () => {
         this.setState({ cdnModal: false })
+    }
+
+    uploadCancel = () => {
+        this.setState({ uploadModal: false })
     }
 
     // 显示配置框
@@ -59,6 +76,20 @@ class App extends Component {
             cdnModal: true
         })
 
+        this.getCdnName()
+    }
+
+    // 显示上传弹框
+    showUpload = () => {
+        this.setState({ 
+            uploadModal: true
+        })
+
+        this.getCdnName()
+    }
+
+    // 获取CDN Name
+    getCdnName = () => {
         return fetch('/get_product_cdns/?product=' + this.props.curProduct, {
                 method: 'GET',
                 credentials: 'include'
@@ -73,6 +104,8 @@ class App extends Component {
 
     // 保存CDN
     createCdn = (params) => {
+        params.product = this.props.curProduct
+
         return fetch('cdn_save/', {
                 method: 'POST',
                 credentials: 'include',
@@ -84,8 +117,10 @@ class App extends Component {
                     this.setState({
                         cdnModal: false
                     })
+
+                    message.success('操作成功！')
                 } else {
-                    message.error('新建失败，请重试！')
+                    message.error('操作失败，请重试！')
                 }
             })
     }
@@ -93,6 +128,11 @@ class App extends Component {
     // 当前选中产品
     getCurProduct = cur => {
         this.props.setCurProduct(cur)
+    }
+
+    // 激活当前选中服务器
+    setActive = active => {
+        this.props.setActive(active)
     }
 
     // 获取服务器列表
@@ -167,8 +207,8 @@ class App extends Component {
     }
 
     render() {
-        const { serverNames, products, curProduct, tableData, loading, keys, search, refreshSearch } = this.props
-        const { username, settingsModal, settingsData, cdnModal, cdnNames } = this.state
+        const { serverNames, products, curProduct, tableData, loading, keys, search, refreshSearch, active } = this.props
+        const { username, settingsModal, settingsData, cdnModal, cdnNames, uploadModal } = this.state
 
         return(
             <div className="main">
@@ -181,6 +221,8 @@ class App extends Component {
                     getCurProduct={this.getCurProduct}
                     showSettings={this.showSettings}
                     showCdn={this.showCdn}
+                    setActive={this.setActive}
+                    active={active}
                 ></Left>
                 <Right
                     username={username}
@@ -193,6 +235,7 @@ class App extends Component {
                     operateFn={this.operateFn}
                     searchFn={this.searchFn}
                     search={search}
+                    showUpload={this.showUpload}
                 ></Right>
                 {
                     this.state.settingsModal
@@ -203,6 +246,7 @@ class App extends Component {
                         getServers={this.getServers}
                         getCurProduct={this.getCurProduct}
                         handleCancel={this.handleCancel}
+                        setActive={this.setActive}
                         data={settingsData}
                     ></SettingModal>
                     :
@@ -222,6 +266,20 @@ class App extends Component {
                     :
                     ''
                 }
+                {
+                    this.state.uploadModal
+                    ?
+                    <UploadModal
+                        uploadModal={uploadModal}
+                        uploadCancel={this.uploadCancel}
+                        cdnNames={cdnNames}
+                        serverNames={serverNames}
+                        active={active}
+                    >
+                    </UploadModal>
+                    :
+                    ''
+                }
             </div>
         )
     }
@@ -235,8 +293,20 @@ const getData = state => {
         tableData: state.serverLeft.tableData,
         loading: state.serverLeft.loading,
         keys: state.serverLeft.keys,
-        search: state.serverLeft.search
+        search: state.serverLeft.search,
+        active: state.serverLeft.active
     }
 }
 
-export default connect(getData, { getProducts, getServers, getTables, setRowKeys, setCurProduct, changeServers, setTables, changeWhite, setSearch })(App)
+export default connect(getData, { 
+    getProducts, 
+    getServers, 
+    getTables, 
+    setRowKeys, 
+    setCurProduct, 
+    changeServers, 
+    setTables, 
+    changeWhite, 
+    setSearch,
+    setActive
+})(App)

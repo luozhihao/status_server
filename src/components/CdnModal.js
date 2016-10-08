@@ -1,5 +1,5 @@
 import React, { Component, PropTypes } from 'react'
-import { Form, Icon, Select, Button, Modal, Input, message } from 'antd'
+import { Form, Icon, Select, Button, Modal, Input, message, Radio } from 'antd'
 
 import 'fetch-polyfill'
 import 'whatwg-fetch'
@@ -7,6 +7,8 @@ require('es6-promise').polyfill()
 
 const FormItem = Form.Item
 const Option = Select.Option
+const RadioButton = Radio.Button
+const RadioGroup = Radio.Group
 
 class CdnModal extends Component {
     constructor(props) {
@@ -18,9 +20,9 @@ class CdnModal extends Component {
     }
 
     // 选择新建或修改
-    operateFn = value => {
+    operateFn = e => {
         this.setState({
-            operate: value
+            operate: e.target.value
         })
     }
 
@@ -40,7 +42,11 @@ class CdnModal extends Component {
 
     // 渠道选择
     issuerChange = value => {
-        return fetch('/get_issuer_path/?issuer=' + value, {
+        let id = this.props.form.getFieldValue('cdn_id') || '',
+            path = '/get_issuer_path/',
+            url = this.state.operate === '2' ? path + '?issuer=' + value + '&cdn_id=' + id : path;
+
+        return fetch(url, {
                 method: 'GET',
                 credentials: 'include'
             })
@@ -61,7 +67,9 @@ class CdnModal extends Component {
                 this.props.form.setFieldsValue({
                     cdn_ip: data.cdn_ip,
                     cdn_user: data.cdn_user,
-                    cdn_pwd: data.cdn_pwd
+                    cdn_pwd: data.cdn_pwd,
+                    cdn_name: data.cdn_name,
+                    cdn_port: data.cdn_port
                 })
             })
     }
@@ -76,9 +84,22 @@ class CdnModal extends Component {
             wrapperCol: { span: 14 }
         }
 
+        const cdnNameProps = getFieldProps('cdn_name', {
+            rules: [
+                { required: true, message: '请填写新CDN名称' }
+            ]
+        })
+
         const cdnAddressProps = getFieldProps('cdn_ip', {
             rules: [
                 { required: true, message: '请填写CDN地址' }
+            ]
+        })
+
+        const cdnPortProps = getFieldProps('cdn_port', {
+            initialValue: '21',
+            rules: [
+                { required: true, message: '请填写CDN端口' }
             ]
         })
 
@@ -96,13 +117,7 @@ class CdnModal extends Component {
 
         const issuerProps = getFieldProps('issuer', {
             rules: [
-                { required: true, type: 'number', message: '请选择渠道' }
-            ]
-        })
-
-        const pathProps = getFieldProps('path', {
-            rules: [
-                { required: true, message: '请填写路径' }
+                { required: false, type: 'number', message: '请选择渠道' }
             ]
         })
 
@@ -122,30 +137,22 @@ class CdnModal extends Component {
                     <FormItem
                         {...formItemLayout}
                         label="操作"
-                    >
-                        <Select
-                            defaultValue="1"
-                            onSelect={this.operateFn}
-                        >   
-                            <Option value="1">新建</Option>
-                            <Option value="2">修改</Option>
-                        </Select>
-                    </FormItem>
-                    <FormItem
-                        {...formItemLayout}
-                        label="CDN名称"
-                        hasFeedback
                     >   
-                        {
-                            this.state.operate === '1'
-                            ?
-                            <Input 
-                                type="text" 
-                                {...getFieldProps('cdn_name', {rules: [{ required: operate === '1', message: '请填写CDN名称' }]})} 
-                                placeholder="请输入CDN名称" />
-                            :
+                        <RadioGroup onChange={this.operateFn} defaultValue="1">
+                            <RadioButton value="1">新建</RadioButton>
+                            <RadioButton value="2">修改</RadioButton>
+                        </RadioGroup>
+                    </FormItem>
+                    {
+                        this.state.operate === '2'
+                        ?
+                        <FormItem
+                            {...formItemLayout}
+                            label="CDN名称"
+                            hasFeedback
+                        >   
                             <Select 
-                                {...getFieldProps('cdn_id', {rules: [{ required: operate === '2', message: '请选择CDN名称' }]})}
+                                {...getFieldProps('cdn_id', {rules: [{ required: operate === '2', type: 'number', message: '请选择CDN名称' }]})}
                                 onSelect={this.nameChange}
                                 placeholder="请选择CDN名称"
                             >   
@@ -155,8 +162,17 @@ class CdnModal extends Component {
                                     )
                                 }
                             </Select>
-                        }
-                        
+                        </FormItem>
+                        :
+                        ''
+                    }
+                    <FormItem
+                        {...formItemLayout}
+                        label="新CDN名称"
+                        hasFeedback
+                        style={{display: this.state.operate === '1' || this.props.form.getFieldValue('cdn_id') ? 'block' : 'none'}}
+                    >
+                        <Input type="text" {...cdnNameProps} placeholder="请输入CDN名称"/>
                     </FormItem>
                     <FormItem
                         {...formItemLayout}
@@ -164,6 +180,13 @@ class CdnModal extends Component {
                         hasFeedback
                     >
                         <Input type="text" {...cdnAddressProps} placeholder="请输入cdn地址" />
+                    </FormItem>
+                    <FormItem
+                        {...formItemLayout}
+                        label="CDN端口"
+                        hasFeedback
+                    >
+                        <Input type="text" {...cdnPortProps} placeholder="请输入cdn端口" />
                     </FormItem>
                     <FormItem
                         {...formItemLayout}
@@ -187,6 +210,7 @@ class CdnModal extends Component {
                             {...issuerProps} 
                             placeholder="请选择渠道"
                             onSelect={this.issuerChange}
+                            allowClear={true}
                         >
                             {
                                 serverNames.map((e, i) =>
@@ -200,7 +224,11 @@ class CdnModal extends Component {
                         label="路径"
                         hasFeedback
                     >
-                        <Input type="text" {...pathProps} placeholder="请输入文件路径" />
+                        <Input 
+                            type="text" 
+                            {...getFieldProps('path', {rules: [{ required: this.props.form.getFieldValue('issuer') ? true : false, message: '请填写路径' }]})} 
+                            placeholder="请输入文件路径"
+                        />
                     </FormItem>
                 </Form>
             </Modal>

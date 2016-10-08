@@ -6,4 +6,5 @@ export const GETLOADING = 'GETLOADING'
 export const GETROWKEYS = 'GETROWKEYS'
 export const GETCURPRODUCT = 'GETCURPRODUCT'
 export const GETSEARCH = 'GETSEARCH'
+export const GETACTIVE = 'GETACTIVE'
 

@@ -9,7 +9,6 @@ class Left extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            active: null,
             settingsModal: false,
             loading: false
         }
@@ -17,23 +16,23 @@ class Left extends Component {
 
     // 激活当前选中服务器
     getList = (i, value) => {
-        this.setState({
-            active: i
-        })
+        const {setActive, getTables} = this.props
 
-        this.props.getTables(value)
+        setActive(i)
+        getTables(value)
     }
 
     // 选择产品获取服务器列表
     handleChange = value => {
-        this.props.getCurProduct(value)
-        this.props.getServers(value)
+        const {getCurProduct, getServers, setActive} = this.props
 
-        this.setState({active: null})
+        getCurProduct(value)
+        getServers(value)
+        setActive(null)
     }
 
     render() {
-        const { products, serverNames, curProduct, showSettings, showCdn } = this.props
+        const { products, serverNames, curProduct, showSettings, showCdn, active } = this.props
 
         return(
             <div>
@@ -58,7 +57,7 @@ class Left extends Component {
                     {
                         serverNames.map((e, i) => 
                             <li 
-                                className={`serverList${this.state.active === i ? ' active' : ''}`} 
+                                className={`serverList${active === i ? ' active' : ''}`} 
                                 key={i} 
                                 onClick={this.getList.bind(this, i, e.IssuerId)}
                             >

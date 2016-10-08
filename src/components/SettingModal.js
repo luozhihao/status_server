@@ -35,10 +35,11 @@ class SettingModal extends Component {
 
     // 选择产品获取服务器列表
     handleChange = value => {
-        this.props.getCurProduct(value)
-        this.props.getServers(value)
+        const { getCurProduct, getServers, setActive } = this.props
 
-        /*this.setState({active: null})*/
+        getCurProduct(value)
+        getServers(value)
+        setActive(null)
     }
 
     // 提交配置信息
@@ -71,7 +72,6 @@ class SettingModal extends Component {
                     incode: values.incode,
                     outcode: values.outcode,
                     whitecode: values.whitecode,
-                    /*cdn: this.state.cdn,*/
                     product: curProduct
                 })
             })
@@ -94,7 +94,7 @@ class SettingModal extends Component {
 
     render() {
         const { getFieldProps } = this.props.form
-        const { handleCancel, data } = this.props
+        const { settingsModal, handleCancel, data } = this.props
 
         const formItemLayout = {
               labelCol: { span: 6 },
@@ -150,18 +150,30 @@ class SettingModal extends Component {
             ]
         })
 
-        console.log(this.props.settingsModal)
-
         return( 
             <Modal ref="modal"
                 width="1000px"
-                visible={this.props.settingsModal}
-                title="配置" onCancel={handleCancel}
+                visible={settingsModal}
+                title="配置" 
+                onCancel={handleCancel}
                 footer={[
-                    <Button key="submit" type="primary" size="large" onClick={this.handleSubmit} loading={this.state.loading}>
-                    保存
+                    <Button 
+                        key="submit" 
+                        type="primary" 
+                        size="large" 
+                        onClick={this.handleSubmit} 
+                        loading={this.state.loading}
+                    >
+                        保存
                     </Button>,
-                    <Button key="back" type="ghost" size="large" onClick={handleCancel}>关 闭</Button>
+                    <Button 
+                        key="back" 
+                        type="ghost" 
+                        size="large" 
+                        onClick={handleCancel}
+                    >
+                        关 闭
+                    </Button>
               ]}
             >
                 <Form horizontal form={this.props.form} className="clearfix">

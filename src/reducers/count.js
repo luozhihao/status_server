@@ -1,4 +1,4 @@
-import { GETPRODUCTS, GETSERVERS, GETTABLES, GETLOADING, GETROWKEYS, GETCURPRODUCT, GETSEARCH } from '../constants'
+import { GETPRODUCTS, GETSERVERS, GETTABLES, GETLOADING, GETROWKEYS, GETCURPRODUCT, GETSEARCH, GETACTIVE } from '../constants'
 
 // 初始化state数据
 const initialState = {
@@ -8,7 +8,8 @@ const initialState = {
     tableData: [],
     loading: false,
     keys: [],
-    search: ''
+    search: '',
+    active: null
 }
 
 export default function serverLeft(state = initialState, action) {
@@ -33,6 +34,9 @@ export default function serverLeft(state = initialState, action) {
             break
         case GETSEARCH:
             return Object.assign({}, state, { search: action.search })
+            break
+        case GETACTIVE:
+            return Object.assign({}, state, { active: action.active })
             break
         default:
             return state

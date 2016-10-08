@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { notification, message, Modal, Button } from 'antd'
-import { GETSERVERS, GETPRODUCTS, GETTABLES, GETLOADING, GETROWKEYS, GETCURPRODUCT, GETSEARCH } from '../constants'
+import { GETSERVERS, GETPRODUCTS, GETTABLES, GETLOADING, GETROWKEYS, GETCURPRODUCT, GETSEARCH, GETACTIVE } from '../constants'
 import 'fetch-polyfill'
 import 'whatwg-fetch'
 require('es6-promise').polyfill()
@@ -77,6 +77,13 @@ export const setSearch = (search) => {
     return {
         type: GETSEARCH,
         search: search
+    }
+}
+
+export const setActive = (active) => {
+    return {
+        type: GETACTIVE,
+        active: active
     }
 }
 
