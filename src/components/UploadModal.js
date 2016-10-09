@@ -1,5 +1,5 @@
 import React, { Component, PropTypes } from 'react'
-import { Form, Icon, Select, Button, Modal, Input, message, Upload } from 'antd'
+import { Form, Icon, Select, Button, Modal, message, Upload } from 'antd'
 
 import 'fetch-polyfill'
 import 'whatwg-fetch'
@@ -18,7 +18,7 @@ class UploadModal extends Component {
 
     render() {
         const { getFieldProps, getFieldValue } = this.props.form
-        const { uploadCancel, uploadModal, cdnNames, serverNames, active } = this.props
+        const { uploadCancel, uploadModal, cdnNames, serverNames, curServer } = this.props
 
         const formItemLayout = {
             labelCol: { span: 6 },
@@ -32,7 +32,7 @@ class UploadModal extends Component {
         })
 
         const issuerProps = getFieldProps('issuer', {
-            initialValue: active ? serverNames[active].IssuerId : '',
+            initialValue: curServer || '',
             rules: [
                 { required: true, type: 'number', message: '请选择渠道' }
             ]
@@ -45,15 +45,6 @@ class UploadModal extends Component {
             data: {
                 cdn_id: getFieldValue('cdn_id'),
                 issuer: getFieldValue('issuer')
-            },
-            beforeUpload(file) {
-                /*const isXlsx = file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-
-                if (!isXlsx) {
-                    message.error('只能上传 .xlsx后缀 文件！')
-                }
-
-                return isXlsx;*/
             },
             onChange(data) {
                 if (data.file.status === 'uploading') {
@@ -132,7 +123,7 @@ class UploadModal extends Component {
                     >
                         <Upload {...props}>
                             <Button type="ghost" disabled={!getFieldValue('cdn_id') || !getFieldValue('issuer')}>
-                              <Icon type="upload" loading={this.state.loading} /> 选择文件并上传
+                                <Icon type="upload" loading={this.state.loading} /> 选择文件并上传
                             </Button>
                         </Upload>
                     </FormItem>

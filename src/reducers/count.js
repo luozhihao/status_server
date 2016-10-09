@@ -1,4 +1,14 @@
-import { GETPRODUCTS, GETSERVERS, GETTABLES, GETLOADING, GETROWKEYS, GETCURPRODUCT, GETSEARCH, GETACTIVE } from '../constants'
+import {
+    GETPRODUCTS,
+    GETSERVERS,
+    GETTABLES,
+    GETLOADING,
+    GETROWKEYS,
+    GETCURPRODUCT,
+    GETSEARCH,
+    GETACTIVE,
+    SETEAI
+} from '../constants'
 
 // 初始化state数据
 const initialState = {
@@ -9,11 +19,13 @@ const initialState = {
     loading: false,
     keys: [],
     search: '',
-    active: null
+    active: null,
+    groups: [],
+    netTypes: []
 }
 
 export default function serverLeft(state = initialState, action) {
-    switch(action.type) {
+    switch (action.type) {
         case GETPRODUCTS:
             return Object.assign({}, state, { products: action.products })
             break
@@ -37,6 +49,9 @@ export default function serverLeft(state = initialState, action) {
             break
         case GETACTIVE:
             return Object.assign({}, state, { active: action.active })
+            break
+        case SETEAI:
+            return Object.assign({}, state, { groups: action.groups, netTypes: action.netTypes })
             break
         default:
             return state

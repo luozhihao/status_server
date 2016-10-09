@@ -28,7 +28,8 @@ class SettingModal extends Component {
                 pwd: data.pwd,
                 incode: data.incode,
                 outcode: data.outcode,
-                whitecode: data.whitecode
+                whitecode: data.whitecode,
+                gameId: data.gameId
             })
         }
     }
@@ -72,6 +73,7 @@ class SettingModal extends Component {
                     incode: values.incode,
                     outcode: values.outcode,
                     whitecode: values.whitecode,
+                    gameId: values.gameId,
                     product: curProduct
                 })
             })
@@ -147,6 +149,12 @@ class SettingModal extends Component {
         const whitecode = getFieldProps('whitecode', {
             rules: [
                 { required: true, message: '请填写查询白名单命令' }
+            ]
+        })
+
+        const gameIdProps = getFieldProps('gameId', {
+            rules: [
+                { required: true, message: '请填写gameId' }
             ]
         })
 
@@ -236,6 +244,13 @@ class SettingModal extends Component {
                                 hasFeedback
                             >
                                 <Input type="text" {...whitecode} placeholder="请输入查询白名单命令" />
+                            </FormItem>
+                            <FormItem
+                                {...formItemLayout}
+                                label="gameId"
+                                hasFeedback
+                            >
+                                <Input type="text" {...gameIdProps} placeholder="请输入gameId" />
                             </FormItem>
                         </div>
                     </div>

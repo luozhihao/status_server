@@ -1,12 +1,19 @@
 import React, { Component } from 'react'
 import { notification, message, Modal, Button } from 'antd'
-import { GETSERVERS, GETPRODUCTS, GETTABLES, GETLOADING, GETROWKEYS, GETCURPRODUCT, GETSEARCH, GETACTIVE } from '../constants'
+import { 
+    GETSERVERS, 
+    GETPRODUCTS, 
+    GETTABLES, 
+    GETLOADING, 
+    GETROWKEYS, 
+    GETCURPRODUCT, 
+    GETSEARCH, 
+    GETACTIVE, 
+    SETEAI 
+} from '../constants'
 import 'fetch-polyfill'
 import 'whatwg-fetch'
 require('es6-promise').polyfill()
-
-// 创建对象时设置初始化信息
-const headers = new Headers()
 
 const openNotification = (type) => {
     notification.open({
@@ -87,6 +94,15 @@ export const setActive = (active) => {
     }
 }
 
+export const setEAI = (groups, netTypes) => {
+    return {
+        type: SETEAI,
+        groups: groups,
+        netTypes: netTypes
+    }
+}
+
+
 // 获取产品下拉框数据
 export function getProducts() {
     return (dispatch, getState) => {
@@ -96,13 +112,10 @@ export function getProducts() {
 
 function fetchProducts() {
     return dispatch => {
-        let request = new Request('/get_user_products/', {
-            headers,
-            method: 'POST',
-            credentials: 'include' // 添加cookies
-        })
-
-        return fetch(request)
+        return fetch('/get_user_products/', {
+                method: 'POST',
+                credentials: 'include' // 添加cookies
+            })
             .then((res) => { return res.json() })
             .then((data) => {
                 dispatch(setProducts(data))
@@ -119,16 +132,13 @@ export function getTables(server, curProduct) {
 
 function fetchTables(server, curProduct) {
     return dispatch => {
-        let request = new Request('/get_server_by_issuer/', {
-            headers,
-            method: 'POST',
-            credentials: 'include',
-            body: JSON.stringify({issuer: server, product: curProduct})
-        })
-
         dispatch(setLoading(true))
 
-        return fetch(request)
+        return fetch('/get_server_by_issuer/', {
+                method: 'POST',
+                credentials: 'include',
+                body: JSON.stringify({issuer: server, product: curProduct})
+            })
             .then((res) => { return res.json() })
             .then((data) => {
                 dispatch(setRowKeys([]))
@@ -147,14 +157,11 @@ export function getServers(product) {
 
 function fetchServers(product) {
     return dispatch => {
-        let request = new Request('/get_issuers_by_product/', {
-            headers,
-            method: 'POST',
-            credentials: 'include',
-            body: JSON.stringify({product: product})
-        })
-
-        return fetch(request)
+        return fetch('/get_issuers_by_product/', {
+                method: 'POST',
+                credentials: 'include',
+                body: JSON.stringify({product: product})
+            })
             .then((res) => { return res.json() })
             .then((data) => {
                 dispatch(setServers(data))
@@ -171,16 +178,13 @@ export function changeServers(param) {
 
 function fetchChangeServers(param) {
     return dispatch => {
-        let request = new Request('/change_server_state/', {
-            headers,
-            method: 'POST',
-            credentials: 'include',
-            body: JSON.stringify(param)
-        })
-
         dispatch(setLoading(true))
 
-        return fetch(request)
+        return fetch('/change_server_state/', {
+                method: 'POST',
+                credentials: 'include',
+                body: JSON.stringify(param)
+            })
             .then((res) => { return res.json() })
             .then((data) => {
                 if (data.result === 1) {
@@ -203,17 +207,15 @@ export function changeWhite(param) {
 
 function fetchChangeWhite(param) {
     return dispatch => {
-        let request = new Request('/change_server_white/', {
-            headers,
-            method: 'POST',
-            credentials: 'include',
-            body: JSON.stringify({type: param.type, stateIds: param.stateIds, product: param.product})
-        })
-
         dispatch(setLoading(true))
+
         const hide = message.loading('正在执行中...', 0)
 
-        return fetch(request)
+        return fetch('/change_server_white/', {
+                method: 'POST',
+                credentials: 'include',
+                body: JSON.stringify({type: param.type, stateIds: param.stateIds, product: param.product})
+            })
             .then((res) => { return res.json() })
             .then((data) => {
                 dispatch(setLoading(false))
@@ -225,6 +227,31 @@ function fetchChangeWhite(param) {
                     param.type !==3 ? openNotification('success') : info(data.output)
                 } else {
                     openNotification('error')
+                }
+            })
+    }
+}
+
+// 获取EAI下拉框
+export function getEAI(product) {
+    return (dispatch, getState) => {
+        return dispatch(fetchEAI(product))
+    }
+}
+
+function fetchEAI(product) {
+    return dispatch => {
+        return fetch('/ajax_get_game_eais/?product=' + product, {
+                method: 'GET',
+                credentials: 'include'
+            })
+            .then((res) => { return res.json() })
+            .then((data) => {
+                if (data.result === 1) {
+                    dispatch(setEAI(data.groups, data.netTypes))
+                } else {
+                    dispatch(setEAI([], []))
+                    message.error('获取状态列表失败！')
                 }
             })
     }

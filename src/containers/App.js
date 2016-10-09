@@ -10,13 +10,16 @@ import {
     setTables, 
     changeWhite, 
     setSearch,
-    setActive
+    setActive,
+    getEAI,
+    setLoading
 } from '../actions/count'
 import Left from '../components/Left'
 import Right from '../components/Right'
 import SettingModal from '../components/SettingModal'
 import CdnModal from '../components/CdnModal'
 import UploadModal from '../components/UploadModal'
+import EaiModal from '../components/EAIModal'
 import { message } from 'antd'
 
 import 'fetch-polyfill'
@@ -33,7 +36,8 @@ class App extends Component {
             settingsData: null,
             cdnModal: false,
             cdnNames: [],
-            uploadModal: false
+            uploadModal: false,
+            EAIModal: false
         }
     }
 
@@ -53,6 +57,10 @@ class App extends Component {
 
     uploadCancel = () => {
         this.setState({ uploadModal: false })
+    }
+
+    EAICancel = () => {
+        this.setState({ EAIModal: false })
     }
 
     // 显示配置框
@@ -86,6 +94,17 @@ class App extends Component {
         })
 
         this.getCdnName()
+    }
+
+    // 显示EAI弹框
+    showEAI = () => {
+        const {getEAI, curProduct} = this.props
+
+        this.setState({ 
+            EAIModal: true
+        })
+
+        getEAI(curProduct)
     }
 
     // 获取CDN Name
@@ -142,11 +161,22 @@ class App extends Component {
 
     // 获取表格数据
     getTables = server => {
-        this.props.setSearch('')
-        this.props.getTables(server, this.props.curProduct)
+        const { setSearch, getTables, curProduct } = this.props
+
+        setSearch('')
+        getTables(server, curProduct)
         this.setState({
             curServer: server
         })
+    }
+
+    // 刷新表格
+    refreshTable = () => {
+        const { curServer } = this.state
+        const { setSearch, getTables, curProduct } = this.props
+
+        setSearch('')
+        getTables(curServer, curProduct)
     }
 
     // 选中行id
@@ -207,8 +237,31 @@ class App extends Component {
     }
 
     render() {
-        const { serverNames, products, curProduct, tableData, loading, keys, search, refreshSearch, active } = this.props
-        const { username, settingsModal, settingsData, cdnModal, cdnNames, uploadModal } = this.state
+        const { 
+            serverNames,
+            products,
+            curProduct, 
+            tableData, 
+            loading, 
+            keys, 
+            search, 
+            refreshSearch, 
+            active, 
+            groups, 
+            netTypes,
+            setLoading
+        } = this.props
+
+        const { 
+            username, 
+            settingsModal, 
+            settingsData,
+            cdnModal, 
+            cdnNames, 
+            uploadModal, 
+            EAIModal,
+            curServer 
+        } = this.state
 
         return(
             <div className="main">
@@ -236,6 +289,7 @@ class App extends Component {
                     searchFn={this.searchFn}
                     search={search}
                     showUpload={this.showUpload}
+                    showEAI={this.showEAI}
                 ></Right>
                 {
                     this.state.settingsModal
@@ -274,9 +328,25 @@ class App extends Component {
                         uploadCancel={this.uploadCancel}
                         cdnNames={cdnNames}
                         serverNames={serverNames}
-                        active={active}
+                        curServer={curServer}
                     >
                     </UploadModal>
+                    :
+                    ''
+                }
+                {
+                    this.state.EAIModal
+                    ?
+                    <EaiModal
+                        EAIModal={EAIModal}
+                        EAICancel={this.EAICancel}
+                        groups={groups}
+                        netTypes={netTypes}
+                        selectedRowKeys={keys}
+                        refreshTable={this.refreshTable}
+                        setLoading={setLoading}
+                    >
+                    </EaiModal>
                     :
                     ''
                 }
@@ -294,7 +364,9 @@ const getData = state => {
         loading: state.serverLeft.loading,
         keys: state.serverLeft.keys,
         search: state.serverLeft.search,
-        active: state.serverLeft.active
+        active: state.serverLeft.active,
+        groups: state.serverLeft.groups,
+        netTypes: state.serverLeft.netTypes,
     }
 }
 
@@ -308,5 +380,7 @@ export default connect(getData, {
     setTables, 
     changeWhite, 
     setSearch,
-    setActive
+    setActive,
+    getEAI,
+    setLoading
 })(App)

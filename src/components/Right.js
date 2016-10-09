@@ -10,7 +10,7 @@ const ButtonGroup = Button.Group
 const columns = [{
     title: 'OrderBy',
     dataIndex: 'OrderBy',
-    width: '10%',
+    width: '8%',
     sorter: (a, b) => a.OrderBy - b.OrderBy
 }, {
     title: 'GameID',
@@ -23,7 +23,7 @@ const columns = [{
 }, {
     title: 'ServerID',
     dataIndex: 'ServerID',
-    width: '10%'
+    width: '7%'
 }, {
     title: 'ServerName',
     dataIndex: 'ServerName',
@@ -36,14 +36,6 @@ const columns = [{
     title: 'Port',
     dataIndex: 'Port',
     width: '5%'
-}, {
-    title: 'OnlineNum',
-    dataIndex: 'OnlineNum',
-    width: '5%'
-}, {
-    title: 'MaxOnlineNum',
-    dataIndex: 'MaxOnlineNum',
-    width: '5%',
 }, {
     title: 'IsRunning',
     dataIndex: 'IsRuning',
@@ -110,6 +102,14 @@ const columns = [{
         )
     },
     sorter: (a, b) => a.IsStartIPWhile - b.IsStartIPWhile
+}, {
+    title: 'Group',
+    dataIndex: 'Group',
+    width: '8%'
+}, {
+    title: 'NetType',
+    dataIndex: 'NetType',
+    width: '7%',
 }]
 
 class Right extends Component {
@@ -155,8 +155,13 @@ class Right extends Component {
         this.props.operateFn(type)
     }
 
+    // 自动生成备用列表
+    getAutoList = () => {
+        message.info('功能开发中...')
+    }
+
     render() {
-        const { tableData, loading, selectedRowKeys, search, showUpload } = this.props
+        const { tableData, loading, selectedRowKeys, search, showUpload, showEAI } = this.props
         const { getFieldProps } = this.props.form
         const rowSelection = {
             selectedRowKeys,
@@ -247,11 +252,16 @@ class Right extends Component {
                                             <Button type="ghost" onClick={this.operateFn.bind(this, 3)} disabled={!hasSelected || loading}>查询是否对外开放</Button>
                                         </ButtonGroup>
                                         <div className="upload-list">
+                                            <Button type="ghost" icon="setting" onClick={showEAI} disabled={!hasSelected || loading}>
+                                                修改EAI状态
+                                            </Button>
+                                        </div>
+                                        <div className="pull-right">
                                             <ButtonGroup>
                                                 <Button type="ghost" icon="upload" onClick={showUpload}>
                                                     手动上传备用列表
                                                 </Button>
-                                                <Button type="ghost" icon="copy">自动生成备用列表</Button>
+                                                <Button type="ghost" icon="copy" onClick={this.getAutoList}>自动生成备用列表</Button>
                                             </ButtonGroup>
                                         </div>
                                     </div>

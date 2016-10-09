@@ -1,11 +1,11 @@
 /* eslint-disable */
-const path = require('path');
 const webpack = require('webpack');
 
 module.exports = {
+    devtool: 'eval-source-map',
     entry: './index.js',
     output: {
-        path: path.join(__dirname, 'dist'),
+        path: __dirname + '/dist',
         filename: 'bundle.js',
         publicPath: '/static/dist/'
     },
@@ -33,23 +33,12 @@ module.exports = {
                 loader: 'url?limit=50000&name=[path][name].[ext]'
             }
         ]
-    }
-}
-
-if (process.env.NODE_ENV !== 'production') {
-    module.exports.plugins = [
+    },
+    plugins: [
         new webpack.DefinePlugin({
             'process.env': {
-                NODE_ENV: '"production"'
+                NODE_ENV: '"development"'
             }
-        }),
-        new webpack.optimize.UglifyJsPlugin({
-            compress: {
-                warnings: false
-            }
-        }),
-        new webpack.optimize.OccurenceOrderPlugin()
+        })
     ]
-} else {
-    module.exports.devtool = '#source-map'
 }
