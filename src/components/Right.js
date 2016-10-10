@@ -161,7 +161,7 @@ class Right extends Component {
     }
 
     render() {
-        const { tableData, loading, selectedRowKeys, search, showUpload, showEAI } = this.props
+        const { tableData, loading, selectedRowKeys, search, showUpload, showEAI, useCDN } = this.props
         const { getFieldProps } = this.props.form
         const rowSelection = {
             selectedRowKeys,
@@ -256,14 +256,20 @@ class Right extends Component {
                                                 修改EAI状态
                                             </Button>
                                         </div>
-                                        <div className="pull-right">
-                                            <ButtonGroup>
-                                                <Button type="ghost" icon="upload" onClick={showUpload}>
-                                                    手动上传备用列表
-                                                </Button>
-                                                <Button type="ghost" icon="copy" onClick={this.getAutoList}>自动生成备用列表</Button>
-                                            </ButtonGroup>
-                                        </div>
+                                        {
+                                            useCDN 
+                                            ? 
+                                            <div className="pull-right">
+                                                <ButtonGroup>
+                                                    <Button type="ghost" icon="upload" onClick={showUpload}>
+                                                        手动上传备用列表
+                                                    </Button>
+                                                    <Button type="ghost" icon="copy" onClick={this.getAutoList}>自动生成备用列表</Button>
+                                                </ButtonGroup>
+                                            </div>
+                                            :
+                                            ''
+                                        }
                                     </div>
                                 )
                             }

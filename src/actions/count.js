@@ -9,7 +9,9 @@ import {
     GETCURPRODUCT, 
     GETSEARCH, 
     GETACTIVE, 
-    SETEAI 
+    SETEAI,
+    SETPOWER,
+    SETCONFIG
 } from '../constants'
 import 'fetch-polyfill'
 import 'whatwg-fetch'
@@ -102,6 +104,19 @@ export const setEAI = (groups, netTypes) => {
     }
 }
 
+export const setPower = (useCDN) => {
+    return {
+        type: SETPOWER,
+        useCDN: useCDN
+    }
+}
+
+export const setConfig = (config) => {
+    return {
+        type: SETCONFIG,
+        config: config
+    }
+}
 
 // 获取产品下拉框数据
 export function getProducts() {
@@ -114,11 +129,12 @@ function fetchProducts() {
     return dispatch => {
         return fetch('/get_user_products/', {
                 method: 'POST',
-                credentials: 'include' // 添加cookies
+                credentials: 'include'
             })
             .then((res) => { return res.json() })
             .then((data) => {
-                dispatch(setProducts(data))
+                dispatch(setProducts(data.products))
+                dispatch(setConfig(data.user_type))
             })
     }
 }
@@ -253,6 +269,26 @@ function fetchEAI(product) {
                     dispatch(setEAI([], []))
                     message.error('获取状态列表失败！')
                 }
+            })
+    }
+}
+
+// 获取权限
+export function getPower(product) {
+    return (dispatch, getState) => {
+        return dispatch(fetchPower(product))
+    }
+}
+
+function fetchPower(product) {
+    return dispatch => {
+        return fetch('/get_use_cdn/?product=' + product, {
+                method: 'GET',
+                credentials: 'include'
+            })
+            .then((res) => { return res.json() })
+            .then((data) => {
+                dispatch(setPower(data.use_cdn))
             })
     }
 }

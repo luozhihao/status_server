@@ -8,4 +8,6 @@ export const GETCURPRODUCT = 'GETCURPRODUCT'
 export const GETSEARCH = 'GETSEARCH'
 export const GETACTIVE = 'GETACTIVE'
 export const SETEAI = 'SETEAI'
+export const SETPOWER = 'SETPOWER'
+export const SETCONFIG = 'SETCONFIG'
 

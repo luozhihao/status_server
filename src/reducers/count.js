@@ -7,7 +7,9 @@ import {
     GETCURPRODUCT,
     GETSEARCH,
     GETACTIVE,
-    SETEAI
+    SETEAI,
+    SETPOWER,
+    SETCONFIG
 } from '../constants'
 
 // 初始化state数据
@@ -21,7 +23,9 @@ const initialState = {
     search: '',
     active: null,
     groups: [],
-    netTypes: []
+    netTypes: [],
+    useCDN: false,
+    config: false
 }
 
 export default function serverLeft(state = initialState, action) {
@@ -52,6 +56,12 @@ export default function serverLeft(state = initialState, action) {
             break
         case SETEAI:
             return Object.assign({}, state, { groups: action.groups, netTypes: action.netTypes })
+            break
+        case SETPOWER:
+            return Object.assign({}, state, { useCDN: action.useCDN })
+            break
+        case SETCONFIG:
+            return Object.assign({}, state, { config: action.config })
             break
         default:
             return state

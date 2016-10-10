@@ -19,7 +19,7 @@ class EaiModal extends Component {
     // 修改EAI状态
     handleSubmit = () => {
         const { getFieldValue } = this.props.form
-        const { selectedRowKeys, EAICancel, refreshTable, setLoading } = this.props
+        const { selectedRowKeys, EAICancel, refreshTable, setLoading, curProduct } = this.props
 
         this.props.form.validateFields((errors, values) => {
             if (!!errors) {
@@ -33,7 +33,8 @@ class EaiModal extends Component {
                     method: 'POST',
                     credentials: 'include',
                     body: JSON.stringify({
-                        serverIds: selectedRowKeys,
+                        product: curProduct,
+                        stateIds: selectedRowKeys,
                         groupId: getFieldValue('group'),
                         netTypeId: getFieldValue('netType')
                     })
@@ -46,7 +47,7 @@ class EaiModal extends Component {
 
                         message.success('操作成功！')
                     } else {
-                        message.error('操作失败！')
+                        'msg' in data ? message.error(data.msg) : message.error('操作失败！')
 
                         setLoading(false)
                     }

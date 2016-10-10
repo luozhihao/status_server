@@ -24,15 +24,16 @@ class Left extends Component {
 
     // 选择产品获取服务器列表
     handleChange = value => {
-        const {getCurProduct, getServers, setActive} = this.props
+        const {getCurProduct, getServers, setActive, getPower} = this.props
 
         getCurProduct(value)
+        getPower(value)
         getServers(value)
         setActive(null)
     }
 
     render() {
-        const { products, serverNames, curProduct, showSettings, showCdn, active } = this.props
+        const { products, serverNames, curProduct, showSettings, showCdn, active, useCDN, config } = this.props
 
         return(
             <div>
@@ -43,7 +44,7 @@ class Left extends Component {
                     <li>
                         <Select 
                             style={{ width: '100%', marginBottom: '20px' }} 
-                            onChange={this.handleChange}
+                            onSelect={this.handleChange}
                             value={curProduct}
                             placeholder="请选择"
                         >
@@ -69,11 +70,23 @@ class Left extends Component {
                     {
                         curProduct !== '请选择'
                         ?
-                        <li className="text-center" style={{ marginTop: '20px'}}>
-                            <ButtonGroup>
-                                <Button type="primary" onClick={showSettings}>配置</Button>
-                                <Button type="default" onClick={showCdn}>CDN</Button>
-                            </ButtonGroup>
+                        <li className="operate-box">
+                            <div className="operate-setting">
+                                {
+                                    config
+                                    ?
+                                    <Button className="operate-btn" type="primary" onClick={showSettings}>配置</Button>
+                                    :
+                                    ''
+                                }
+                                {
+                                    useCDN
+                                    ?
+                                    <Button className="operate-btn" style={{marginLeft: '5px'}} type="primary" onClick={showCdn}>CDN</Button>
+                                    :
+                                    ''
+                                }
+                            </div>
                         </li>
                         :
                         <li></li>

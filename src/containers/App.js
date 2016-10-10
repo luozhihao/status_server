@@ -12,7 +12,8 @@ import {
     setSearch,
     setActive,
     getEAI,
-    setLoading
+    setLoading,
+    getPower
 } from '../actions/count'
 import Left from '../components/Left'
 import Right from '../components/Right'
@@ -210,6 +211,13 @@ class App extends Component {
         this.props.setSearch(txt)
     }
 
+    // 获取权限
+    getPower = (product) => {
+        const { getPower } = this.props
+
+        getPower(product)
+    }
+
     // 获取用户名
     getUser = () => {
         return fetch('/userinfo/', {
@@ -249,7 +257,9 @@ class App extends Component {
             active, 
             groups, 
             netTypes,
-            setLoading
+            setLoading,
+            useCDN,
+            config
         } = this.props
 
         const { 
@@ -276,6 +286,9 @@ class App extends Component {
                     showCdn={this.showCdn}
                     setActive={this.setActive}
                     active={active}
+                    getPower={this.getPower}
+                    useCDN={useCDN}
+                    config={config}
                 ></Left>
                 <Right
                     username={username}
@@ -290,6 +303,7 @@ class App extends Component {
                     search={search}
                     showUpload={this.showUpload}
                     showEAI={this.showEAI}
+                    useCDN={useCDN}
                 ></Right>
                 {
                     this.state.settingsModal
@@ -302,6 +316,7 @@ class App extends Component {
                         handleCancel={this.handleCancel}
                         setActive={this.setActive}
                         data={settingsData}
+                        getPower={this.getPower}
                     ></SettingModal>
                     :
                     ''
@@ -345,6 +360,7 @@ class App extends Component {
                         selectedRowKeys={keys}
                         refreshTable={this.refreshTable}
                         setLoading={setLoading}
+                        curProduct={curProduct}
                     >
                     </EaiModal>
                     :
@@ -367,6 +383,8 @@ const getData = state => {
         active: state.serverLeft.active,
         groups: state.serverLeft.groups,
         netTypes: state.serverLeft.netTypes,
+        useCDN: state.serverLeft.useCDN,
+        config: state.serverLeft.config
     }
 }
 
@@ -382,5 +400,6 @@ export default connect(getData, {
     setSearch,
     setActive,
     getEAI,
-    setLoading
+    setLoading,
+    getPower
 })(App)

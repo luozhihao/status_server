@@ -122,8 +122,8 @@ class UploadModal extends Component {
                         label="上传文件"
                     >
                         <Upload {...props}>
-                            <Button type="ghost" disabled={!getFieldValue('cdn_id') || !getFieldValue('issuer')}>
-                                <Icon type="upload" loading={this.state.loading} /> 选择文件并上传
+                            <Button type="ghost" loading={this.state.loading} icon="upload" disabled={!getFieldValue('cdn_id') || !getFieldValue('issuer')}>
+                                选择文件并上传
                             </Button>
                         </Upload>
                     </FormItem>

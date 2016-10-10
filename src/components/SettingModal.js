@@ -1,5 +1,5 @@
 import React, { Component, PropTypes } from 'react'
-import { Form, Icon, Select, Button, Modal, Input, message } from 'antd'
+import { Form, Icon, Select, Button, Modal, Input, message, Radio } from 'antd'
 
 import 'fetch-polyfill'
 import 'whatwg-fetch'
@@ -7,6 +7,8 @@ require('es6-promise').polyfill()
 
 const FormItem = Form.Item
 const Option = Select.Option
+const RadioButton = Radio.Button
+const RadioGroup = Radio.Group
 
 class SettingModal extends Component {
     constructor(props) {
@@ -29,16 +31,18 @@ class SettingModal extends Component {
                 incode: data.incode,
                 outcode: data.outcode,
                 whitecode: data.whitecode,
-                gameId: data.gameId
+                gameId: data.gameId,
+                use_cdn: data.use_cdn
             })
         }
     }
 
     // 选择产品获取服务器列表
     handleChange = value => {
-        const { getCurProduct, getServers, setActive } = this.props
+        const { getCurProduct, getServers, setActive, getPower } = this.props
 
         getCurProduct(value)
+        getPower(value)
         getServers(value)
         setActive(null)
     }
@@ -74,7 +78,8 @@ class SettingModal extends Component {
                     outcode: values.outcode,
                     whitecode: values.whitecode,
                     gameId: values.gameId,
-                    product: curProduct
+                    product: curProduct,
+                    use_cdn: values.use_cdn
                 })
             })
             .then((res) => { return res.json() })
@@ -90,6 +95,7 @@ class SettingModal extends Component {
                 } else {
                     message.error('保存失败！')
                 }
+
                 this.setState({loading: false})
             })
     }
@@ -155,6 +161,13 @@ class SettingModal extends Component {
         const gameIdProps = getFieldProps('gameId', {
             rules: [
                 { required: true, message: '请填写gameId' }
+            ]
+        })
+
+        const startCDNProps = getFieldProps('use_cdn', {
+            initialValue: false,
+            rules: [
+                { required: true, type: 'boolean', message: '请选择是否启用' }
             ]
         })
 
@@ -251,6 +264,16 @@ class SettingModal extends Component {
                                 hasFeedback
                             >
                                 <Input type="text" {...gameIdProps} placeholder="请输入gameId" />
+                            </FormItem>
+                            <FormItem
+                                {...formItemLayout}
+                                label="是否启用CDN"
+                                hasFeedback
+                            >
+                                <RadioGroup {...startCDNProps}>
+                                    <RadioButton value={true}>启用</RadioButton>
+                                    <RadioButton value={false}>不启用</RadioButton>
+                                </RadioGroup>
                             </FormItem>
                         </div>
                     </div>
