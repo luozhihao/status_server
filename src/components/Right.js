@@ -161,7 +161,7 @@ class Right extends Component {
     }
 
     render() {
-        const { tableData, loading, selectedRowKeys, search, showUpload, showEAI, useCDN } = this.props
+        const { tableData, loading, selectedRowKeys, search, showUpload, showEAI, useCDN, restart } = this.props
         const { getFieldProps } = this.props.form
         const rowSelection = {
             selectedRowKeys,
@@ -254,6 +254,11 @@ class Right extends Component {
                                         <div className="upload-list">
                                             <Button type="ghost" icon="setting" onClick={showEAI} disabled={!hasSelected || loading}>
                                                 修改EAI状态
+                                            </Button>
+                                        </div>
+                                        <div className="upload-list">
+                                            <Button type="ghost" icon="hdd" onClick={restart} disabled={!hasSelected || loading}>
+                                                重启dumper
                                             </Button>
                                         </div>
                                         {

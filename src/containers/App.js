@@ -13,7 +13,8 @@ import {
     setActive,
     getEAI,
     setLoading,
-    getPower
+    getPower,
+    restartDumper
 } from '../actions/count'
 import Left from '../components/Left'
 import Right from '../components/Right'
@@ -206,6 +207,12 @@ class App extends Component {
         changeWhite({type: type, stateIds: keys, product: curProduct})
     }
 
+    restart = () => {
+        const {curProduct, keys, restartDumper} = this.props
+
+        restartDumper({product: curProduct, stateIds: keys})
+    }
+
     // 搜索内容
     searchFn = txt => {
         this.props.setSearch(txt)
@@ -304,6 +311,7 @@ class App extends Component {
                     showUpload={this.showUpload}
                     showEAI={this.showEAI}
                     useCDN={useCDN}
+                    restart={this.restart}
                 ></Right>
                 {
                     this.state.settingsModal
@@ -401,5 +409,6 @@ export default connect(getData, {
     setActive,
     getEAI,
     setLoading,
-    getPower
+    getPower,
+    restartDumper
 })(App)

@@ -193,9 +193,9 @@ class SettingModal extends Component {
                         size="large" 
                         onClick={handleCancel}
                     >
-                        关 闭
+                        关闭
                     </Button>
-              ]}
+                ]}
             >
                 <Form horizontal form={this.props.form} className="clearfix">
                     <div className="clearfix">

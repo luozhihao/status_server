@@ -292,3 +292,37 @@ function fetchPower(product) {
             })
     }
 }
+
+// 重启dumper
+export function restartDumper(param) {
+    return (dispatch, getState) => {
+        return dispatch(fetchRestartDumper(param))
+    }
+}
+
+function fetchRestartDumper(param) {
+    return dispatch => {
+        dispatch(setLoading(true))
+
+        const hide = message.loading('正在执行中...', 0)
+
+        return fetch('/restart_server_dumper/', {
+                method: 'POST',
+                credentials: 'include',
+                body: JSON.stringify({stateIds: param.stateIds, product: param.product})
+            })
+            .then((res) => { return res.json() })
+            .then((data) => {
+                dispatch(setLoading(false))
+                setTimeout(hide, 0)
+
+                if (data.result === 1) {
+                    dispatch(setRowKeys([]))
+
+                    openNotification('success')
+                } else {
+                    openNotification('error')
+                }
+            })
+    }
+}
